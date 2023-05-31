@@ -16,10 +16,20 @@ require("wx");
 ]]
 
 
-
+function print(s)
+	wx.wxLogMessage(tostring(s));
+end
+function printf(s, ...)
+	wx.wxLogMessage(string.format(s, ...));
+end
 
 local function main()
 	local frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, 'OutbreakSim GUI');
+	wx.wxLog.DontCreateOnDemand();
+	
+	local logWindow = wx.wxLogWindow(wx.NULL, "title", true);
+	wx.wxLog.SetLogLevel(wx.wxLOG_Info);
+	
 
 	local button = wx.wxButton(frame, wx.wxID_ANY, "Text");
 	button:SetSize(100,100);
@@ -34,12 +44,7 @@ local function main()
 
 	frame:Connect(1001, wx.wxEVT_BUTTON,
 	function (event)
-		--Doesn't print, look into: https://docs.wxwidgets.org/trunk/classwx_log_window.html
 		print("ButtonClick");
-		wx.wxMessageBox(textInput:GetValue(),
-						"About wxLua",
-						wx.wxOK + wx.wxICON_INFORMATION,
-						frame)
 	end )
 	print("HERE");
 	frame:Show();
