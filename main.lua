@@ -23,6 +23,29 @@ function printf(s, ...)
 	wx.wxLogMessage(string.format(s, ...));
 end
 
+local stuff = require("stuff")
+
+--takes ir and turn it into Infected -> Recovered
+local function paramToLongName(param)
+	local ret = "";
+	for q = 1, 2 do
+		if q == 2 then
+			ret = ret .. " -> ";
+		end
+		for i, v in ipairs(stuff.paramNames) do
+			if v:sub(1,1):lower() == param:sub(q,q) then
+				ret = ret .. v;
+				break;
+			end
+		end
+	end
+	return ret;
+end
+
+local rollingID = 1001;
+
+local paramsControls = {};
+
 local function main()
 	local frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, 'OutbreakSim GUI');
 	wx.wxLog.DontCreateOnDemand();
@@ -30,16 +53,23 @@ local function main()
 	local logWindow = wx.wxLogWindow(wx.NULL, "title", true);
 	wx.wxLog.SetLogLevel(wx.wxLOG_Info);
 	
-
-	local button = wx.wxButton(frame, wx.wxID_ANY, "Text");
-	button:SetSize(100,100);
-	button:SetPosition(wx.wxPoint(100,100));
-	local button2 = wx.wxButton(frame, 1001, "Text2");
-	button2:SetSize(100,100);
 	
-	local textInput = wx.wxTextCtrl(frame, 1002, "text");
-	textInput:SetSize(100, 30);
-	textInput:SetPosition(wx.wxPoint(200,200));
+	local window = wx.wxScrolledWindow(frame, wx.wxID_ANY);
+	--window:SetScrollbars(1,1,,1000);
+
+	--Parameters section
+
+	for q = 1, #stuff.params do
+		--unfinished line
+		--paramsControls[q] = wx.wxTextCtrl
+	end
+	
+
+	
+
+	local button = wx.wxButton(window, wx.wxID_ANY, "Text");
+      button:SetSize(100,400);
+      button:SetPosition(wx.wxPoint(100,100));
 
 
 	frame:Connect(1001, wx.wxEVT_BUTTON,
