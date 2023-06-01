@@ -42,12 +42,20 @@ local function paramToLongName(param)
 	return ret;
 end
 
+local function createDefaultTextCtrlTextEvent(name)
+	return function()
+		print(name);
+	end
+end
+
 local rollingID = 1001;
+
+local rollingYPos = 0;
 
 local paramsControls = {};
 
 local function main()
-	local frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, 'OutbreakSim GUI');
+	local frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, 'OutbreakSim GUI', wx.wxDefaultPosition, wx.wxSize(800,600));
 	wx.wxLog.DontCreateOnDemand();
 	
 	local logWindow = wx.wxLogWindow(wx.NULL, "title", true);
@@ -60,17 +68,13 @@ local function main()
 	--Parameters section
 
 	for q = 1, #stuff.params do
-		--unfinished line
-		--paramsControls[q] = wx.wxTextCtrl
+		paramsControls[q] = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(0, rollingYPos))
+
+		frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent(q))
+
+		rollingID = rollingID + 1;
+		rollingYPos = rollingYPos + 40;
 	end
-	
-
-	
-
-	local button = wx.wxButton(window, wx.wxID_ANY, "Text");
-      button:SetSize(100,400);
-      button:SetPosition(wx.wxPoint(100,100));
-
 
 	frame:Connect(1001, wx.wxEVT_BUTTON,
 	function (event)
