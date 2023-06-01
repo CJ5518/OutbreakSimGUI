@@ -52,7 +52,21 @@ local rollingID = 1001;
 
 local rollingYPos = 0;
 
+local function addID()
+	rollingID = rollingID + 1
+end
+
+local function addYPos(n)
+	rollingYPos = rollingYPos + n;
+end
+
+local function addBoth(n)
+	addID();
+	addYPos(n);
+end
+
 local paramsControls = {};
+local airportTextCtrl;
 
 local function main()
 	local frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, 'OutbreakSim GUI', wx.wxDefaultPosition, wx.wxSize(800,600));
@@ -65,22 +79,60 @@ local function main()
 	local window = wx.wxScrolledWindow(frame, wx.wxID_ANY);
 	--window:SetScrollbars(1,1,,1000);
 
-	--Parameters section
-
-	for q = 1, #stuff.params do
-		paramsControls[q] = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(0, rollingYPos))
-
-		frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent(q))
-
-		rollingID = rollingID + 1;
-		rollingYPos = rollingYPos + 40;
+	local function makeLabel(text, dontUpdateY)
+		local ret = wx.wxStaticText(window, rollingID, text, wx.wxPoint(0, rollingYPos));
+		addBoth(20);
+		return ret;
 	end
 
-	frame:Connect(1001, wx.wxEVT_BUTTON,
-	function (event)
-		print("ButtonClick");
-	end )
-	print("HERE");
+	--Output dir picker
+	makeLabel("Output csv folder")
+	wx.wxDirPickerCtrl(window, rollingID, wx.wxGetCwd(), "I'm the message parameter",
+		wx.wxPoint(0, rollingYPos), wx.wxSize(500,30),
+		wx.wxDIRP_USE_TEXTCTRL)
+	addBoth(50);
+	makeLabel("Output file postfix");
+	wx.wxTextCtrl(window, rollingID, "-Run1", wx.wxPoint(0, rollingYPos), wx.wxSize(100,30));
+	addBoth(40);
+
+	--Parameters section
+	local xSize = 200;
+	local qOffset = 1;
+	for q = 1, #stuff.params do
+		wx.wxStaticText(window, rollingID, paramToLongName(stuff.params[q]), wx.wxPoint((q-qOffset)*xSize, rollingYPos));
+		addID();
+		paramsControls[q] = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint((q-qOffset)*xSize, rollingYPos+30));
+
+		frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent(q));
+
+		addID();
+		if q == 4 then addYPos(80); qOffset = 5; end
+	end
+	addYPos(80);
+
+	--Airport text entry, can't be a combo box because too many elements caused it to crash
+	local airportLabelText = "Airport starting location, e.g LAX, JFK, ATL, etc."
+	local airportLabel = makeLabel(airportLabelText)
+	airportTextCtrl = wx.wxTextCtrl(window, rollingID, "ATL", wx.wxPoint(0, rollingYPos), wx.wxSize(150,30))
+	frame:Connect(rollingID, wx.wxEVT_TEXT, function()
+		print(airportTextCtrl:GetLineText(0));
+		local isValid = false;
+		local text = airportTextCtrl:GetLineText(0);
+		if text:len() == 3 then
+			for i, v in pairs(stuff.airportCodes) do
+				if v == text:upper() then
+					isValid = true;
+				end
+			end
+		end
+
+		if not isValid then
+			airportLabel:SetLabel(airportLabelText .. " - INVALID")
+		else
+			airportLabel:SetLabel(airportLabelText);
+		end
+		createDefaultTextCtrlTextEvent()();
+	end);
 	frame:Show();
 end
 
