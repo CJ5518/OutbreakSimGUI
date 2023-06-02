@@ -27,17 +27,17 @@ makeEntry(
 );
 
 makeEntry(
-	"Output file postfix",
-	"-opost",
-	"string",
-	"String of characters to append to the output filename - useful for differentiating runs"
-);
-
-makeEntry(
 	"Deterministic",
 	"-deterministic",
 	"boolean",
 	"Use the deterministic simulation model (default is stochastic)"
+)
+
+makeEntry(
+	"Gravity Model",
+	"-gravity",
+	"boolean",
+	"Use the gravity model (default is CJ model)"
 )
 
 makeEntry(
