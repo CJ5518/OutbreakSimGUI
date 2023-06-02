@@ -42,12 +42,6 @@ local function paramToLongName(param)
 	return ret;
 end
 
-local function createDefaultTextCtrlTextEvent(name)
-	return function()
-		print(name);
-	end
-end
-
 local rollingID = 1001;
 
 local rollingYPos = 0;
@@ -65,8 +59,56 @@ local function addBoth(n)
 	addYPos(n);
 end
 
+--info stored like paramsControls[1] = {wxTextCtrl, "ir"}
 local paramsControls = {};
+--Info for both of these in the form {wxControl, "-stop"}
+local textControls = {};
+local boolControls = {};
 local airportTextCtrl;
+
+local function updateFullArgs()
+	local argsString = "";
+	local paramString = "";
+	for i,v in ipairs(paramsControls) do
+		if v[1]:GetValue() ~= "" then
+			--Already a param in the string, add a comma before this one
+			if paramString ~= "" then
+				paramString = paramString .. ",";
+			end
+			paramString = paramString .. v[2] .. "=" .. v[1]:GetValue();
+		end
+	end
+	if paramString ~= "" then
+		argsString = argsString .. "--params " .. paramString;
+	end
+
+	--Text controls
+	for i,v in ipairs(textControls) do
+		if v[1]:GetValue() ~= "" then
+			if argsString ~= "" then
+				argsString = argsString .. " ";
+			end
+			argsString = argsString .. v[2] .. " " .. v[1]:GetValue();
+		end
+	end
+	--Boolean controls
+	for i,v in ipairs(textControls) do
+		if v[1]:GetValue() ~= "" then
+			if argsString ~= "" then
+				argsString = argsString .. " ";
+			end
+			argsString = argsString .. v[2] .. " " .. v[1]:GetValue();
+		end
+	end
+	print(argsString);
+end
+
+local function createDefaultTextCtrlTextEvent()
+	return updateFullArgs;
+end
+local function createDefaultCheckBoxEvent()
+	return updateFullArgs;
+end
 
 local function main()
 	local frame = wx.wxFrame(wx.NULL, wx.wxID_ANY, 'OutbreakSim GUI', wx.wxDefaultPosition, wx.wxSize(800,600));
@@ -77,7 +119,7 @@ local function main()
 	
 	
 	local window = wx.wxScrolledWindow(frame, wx.wxID_ANY);
-	--window:SetScrollbars(1,1,,1000);
+	window:SetScrollbars(1,1,1,700);
 
 	local function makeLabel(text)
 		local ret = wx.wxStaticText(window, rollingID, text, wx.wxPoint(0, rollingYPos));
@@ -95,7 +137,8 @@ local function main()
 	end)
 	addBoth(50);
 	makeLabel("Output file postfix");
-	wx.wxTextCtrl(window, rollingID, "-Run1", wx.wxPoint(0, rollingYPos), wx.wxSize(100,30));
+	textControls[#textControls + 1] = {wx.wxTextCtrl(window, rollingID, "-Run1", wx.wxPoint(0, rollingYPos), wx.wxSize(100,30)), "-opost"};
+	frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent(q));
 	addBoth(40);
 
 	--Parameters section
@@ -104,9 +147,9 @@ local function main()
 	for q = 1, #stuff.params do
 		wx.wxStaticText(window, rollingID, paramToLongName(stuff.params[q]), wx.wxPoint((q-qOffset)*xSize, rollingYPos));
 		addID();
-		paramsControls[q] = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint((q-qOffset)*xSize, rollingYPos+30));
+		paramsControls[q] = {wx.wxTextCtrl(window, rollingID, "", wx.wxPoint((q-qOffset)*xSize, rollingYPos+30)), stuff.params[q]};
 
-		frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent(q));
+		frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent());
 
 		addID();
 		if q == 4 then addYPos(80); qOffset = 5; end
@@ -117,6 +160,7 @@ local function main()
 	local airportLabelText = "Airport starting location, e.g LAX, JFK, ATL, etc."
 	local airportLabel = makeLabel(airportLabelText)
 	airportTextCtrl = wx.wxTextCtrl(window, rollingID, "ATL", wx.wxPoint(0, rollingYPos), wx.wxSize(150,30))
+	textControls[#textControls+1] = {airportTextCtrl, "-startat"};
 	frame:Connect(rollingID, wx.wxEVT_TEXT, function()
 		print(airportTextCtrl:GetLineText(0));
 		local isValid = false;
@@ -136,17 +180,28 @@ local function main()
 		end
 		createDefaultTextCtrlTextEvent()();
 	end);
+	addBoth(40);
 
 	--Entries defined in stuff.lua
 	for i,entry in ipairs(stuff.entries) do
 		if entry[3] == "boolean" then
+			boolControls[#boolControls + 1] = {wx.wxCheckBox(window, rollingID, entry[1], wx.wxPoint(0, rollingYPos), wx.wxSize(200,30)), entry[2]};
+			frame:Connect(rollingID, wx.wxEVT_CHECKBOX, createDefaultCheckBoxEvent());
+			addBoth(30);
+		elseif entry[3] == "number" or entry[3] == "string" then
 			makeLabel(entry[1]);
-			--unfinished line
-			--wx.wxCheckBox(window, rollingID, )
+			textControls[#textControls+1] = {wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(0, rollingYPos), wx.wxSize(200, 30)), entry[2]};
+			frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent());
+			addBoth(30);
 		end
 	end
 
-
+	--Additional args and the arg viewer
+	makeLabel("Additional arguments");
+	wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(0, rollingYPos), wx.wxSize(300, 30));
+	addBoth(40);
+	makeLabel("Output command");
+	wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(0, rollingYPos), wx.wxSize(300, 30), wx.wxTE_READONLY);
 	frame:Show();
 end
 
