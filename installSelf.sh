@@ -3,6 +3,7 @@
 cd ~
 mkdir Desktop
 touch Desktop/mapsimgui.sh
+chmod +x mapsimgui.sh
 echo "#!/bin/bash\n\ncd ~/mapsimgui/\nsingularity run mapsimgui.sif\n"
 
 cd mapsimgui
