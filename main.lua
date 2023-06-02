@@ -1,21 +1,5 @@
 require("wx");
 
---[[
-    control = wx.wxDirPickerCtrl(scrollWin, ID_DIRPICKERCTRL, wx.wxGetCwd(), "I'm the message parameter",
-                                         wx.wxDefaultPosition, wx.wxDefaultSize,
-                                         wx.wxDIRP_USE_TEXTCTRL)
-    AddControl("wxDirPickerCtrl", control)
-
-    -- -----------------------------------------------------------------------
-
-    control = wx.wxFilePickerCtrl(scrollWin, ID_FILEPICKERCTRL, wx.wxGetCwd(), wx.wxFileSelectorPromptStr, wx.wxFileSelectorDefaultWildcardStr,
-                                         wx.wxDefaultPosition, wx.wxDefaultSize,
-                                         wx.wxFLP_USE_TEXTCTRL)
-    AddControl("wxFilePickerCtrl", control)
-
-]]
-
-
 function print(s)
 	wx.wxLogMessage(tostring(s));
 end
@@ -24,6 +8,7 @@ function printf(s, ...)
 end
 
 local stuff = require("stuff")
+local slurmUtilities = require("slurmUtils")
 
 --takes ir and turn it into Infected -> Recovered
 local function paramToLongName(param)
@@ -70,7 +55,7 @@ local additionalArgsControl;
 local outputCommandControl;
 
 local function updateFullArgs()
-	local argsString = "-o " .. outputFolderDirPicker:GetPath() .. "/";
+	local argsString = "~/mapsimgui/mapsim/MapSimulation1.x86_64 -o " .. outputFolderDirPicker:GetPath() .. "/";
 	local paramString = "";
 	for i,v in ipairs(paramsControls) do
 		if v[1]:GetValue() ~= "" then
@@ -89,6 +74,9 @@ local function updateFullArgs()
 	for i,v in ipairs(textControls) do
 		if v[1]:GetValue() ~= "" then
 			argsString = argsString .. " " .. v[2] .. " " .. v[1]:GetValue();
+			if v[2] == "-opost" then
+				argsString = argsString .. "-$SLURM_ARRAY_TASK_ID";
+			end
 		end
 	end
 	--Boolean controls
@@ -99,6 +87,7 @@ local function updateFullArgs()
 	end
 	argsString = argsString .. " " .. additionalArgsControl:GetValue();
 	outputCommandControl:SetValue(argsString);
+	return argsString;
 end
 
 local function createDefaultTextCtrlTextEvent()
@@ -127,12 +116,13 @@ local function main()
 
 	--Output dir picker
 	makeLabel("Output csv folder")
-	outputFolderDirPicker = wx.wxDirPickerCtrl(window, rollingID, wx.wxGetCwd(), "I'm the message parameter",
+	outputFolderDirPicker = wx.wxDirPickerCtrl(window, rollingID, "~/mapsimgui/output", "I'm the message parameter",
 		wx.wxPoint(0, rollingYPos), wx.wxSize(500,30),
 		wx.wxDIRP_USE_TEXTCTRL)
 	frame:Connect(rollingID, wx.wxEVT_DIRPICKER_CHANGED, updateFullArgs)
 	addBoth(50);
 	makeLabel("Output file postfix");
+	--It is important that this stay as the exact string "-opost"
 	textControls[#textControls + 1] = {wx.wxTextCtrl(window, rollingID, "-Run1", wx.wxPoint(0, rollingYPos), wx.wxSize(100,30)), "-opost"};
 	frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent());
 	addBoth(40);
@@ -192,11 +182,29 @@ local function main()
 		end
 	end
 
-	--Additional args and the arg viewer
+	--Additional args
 	makeLabel("Additional arguments");
 	additionalArgsControl = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(0, rollingYPos), wx.wxSize(500, 30));
 	frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent());
 	addBoth(40);
+
+	--Go button and go number
+	makeLabel("# of simulations to run")
+	local simNumberControl = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(0, rollingYPos), wx.wxSize(200, 30));
+	addBoth(40);
+	--Go button
+	wx.wxButton(window, rollingID, "GO!", wx.wxPoint(0, rollingYPos), wx.wxSize(100,30));
+	frame:Connect(rollingID, wx.wxEVT_BUTTON, function()
+		slurmUtilities.runJob(updateFullArgs(), tonumber(simNumberControl:GetValue()));
+	end)
+	addID();
+	--Jobs viewer button
+	wx.wxButton(window, rollingID, "See Running", wx.wxPoint(100, rollingYPos), wx.wxSize(100,30));
+	frame:Connect(rollingID, wx.wxEVT_BUTTON, function()
+		slurmUtilities.printRunningJobs();
+	end)
+	addBoth(40);
+	--Arg viewer
 	makeLabel("Output command");
 	outputCommandControl = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(0, rollingYPos), wx.wxSize(500, 90), bit32.bor(wx.wxTE_READONLY, wx.wxTE_NO_VSCROLL,wx.wxTE_MULTILINE));
 	frame:Show();
