@@ -4,7 +4,11 @@
 local module = {};
 
 local function makeEntry(name, argName, paramType, helpText)
-	
+	if not module.entries then
+		module.entries = {};
+	else
+		module.entries[#module.entries+1] = {name, argName, paramType, helpText}
+	end
 end
 
 

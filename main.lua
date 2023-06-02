@@ -79,7 +79,7 @@ local function main()
 	local window = wx.wxScrolledWindow(frame, wx.wxID_ANY);
 	--window:SetScrollbars(1,1,,1000);
 
-	local function makeLabel(text, dontUpdateY)
+	local function makeLabel(text)
 		local ret = wx.wxStaticText(window, rollingID, text, wx.wxPoint(0, rollingYPos));
 		addBoth(20);
 		return ret;
@@ -90,6 +90,9 @@ local function main()
 	wx.wxDirPickerCtrl(window, rollingID, wx.wxGetCwd(), "I'm the message parameter",
 		wx.wxPoint(0, rollingYPos), wx.wxSize(500,30),
 		wx.wxDIRP_USE_TEXTCTRL)
+	frame:Connect(rollingID, wx.wxEVT_DIRPICKER_CHANGED, function ()
+		
+	end)
 	addBoth(50);
 	makeLabel("Output file postfix");
 	wx.wxTextCtrl(window, rollingID, "-Run1", wx.wxPoint(0, rollingYPos), wx.wxSize(100,30));
@@ -133,6 +136,17 @@ local function main()
 		end
 		createDefaultTextCtrlTextEvent()();
 	end);
+
+	--Entries defined in stuff.lua
+	for i,entry in ipairs(stuff.entries) do
+		if entry[3] == "boolean" then
+			makeLabel(entry[1]);
+			--unfinished line
+			--wx.wxCheckBox(window, rollingID, )
+		end
+	end
+
+
 	frame:Show();
 end
 
