@@ -65,9 +65,12 @@ local paramsControls = {};
 local textControls = {};
 local boolControls = {};
 local airportTextCtrl;
+local outputFolderDirPicker;
+local additionalArgsControl;
+local outputCommandControl;
 
 local function updateFullArgs()
-	local argsString = "";
+	local argsString = "-o " .. outputFolderDirPicker:GetPath() .. "/";
 	local paramString = "";
 	for i,v in ipairs(paramsControls) do
 		if v[1]:GetValue() ~= "" then
@@ -79,28 +82,23 @@ local function updateFullArgs()
 		end
 	end
 	if paramString ~= "" then
-		argsString = argsString .. "--params " .. paramString;
+		argsString = argsString .. " --params " .. paramString;
 	end
 
 	--Text controls
 	for i,v in ipairs(textControls) do
 		if v[1]:GetValue() ~= "" then
-			if argsString ~= "" then
-				argsString = argsString .. " ";
-			end
-			argsString = argsString .. v[2] .. " " .. v[1]:GetValue();
+			argsString = argsString .. " " .. v[2] .. " " .. v[1]:GetValue();
 		end
 	end
 	--Boolean controls
-	for i,v in ipairs(textControls) do
-		if v[1]:GetValue() ~= "" then
-			if argsString ~= "" then
-				argsString = argsString .. " ";
-			end
-			argsString = argsString .. v[2] .. " " .. v[1]:GetValue();
+	for i,v in ipairs(boolControls) do
+		if v[1]:GetValue() then
+			argsString = argsString .. " " .. v[2]
 		end
 	end
-	print(argsString);
+	argsString = argsString .. " " .. additionalArgsControl:GetValue();
+	outputCommandControl:SetValue(argsString);
 end
 
 local function createDefaultTextCtrlTextEvent()
@@ -129,16 +127,14 @@ local function main()
 
 	--Output dir picker
 	makeLabel("Output csv folder")
-	wx.wxDirPickerCtrl(window, rollingID, wx.wxGetCwd(), "I'm the message parameter",
+	outputFolderDirPicker = wx.wxDirPickerCtrl(window, rollingID, wx.wxGetCwd(), "I'm the message parameter",
 		wx.wxPoint(0, rollingYPos), wx.wxSize(500,30),
 		wx.wxDIRP_USE_TEXTCTRL)
-	frame:Connect(rollingID, wx.wxEVT_DIRPICKER_CHANGED, function ()
-		
-	end)
+	frame:Connect(rollingID, wx.wxEVT_DIRPICKER_CHANGED, updateFullArgs)
 	addBoth(50);
 	makeLabel("Output file postfix");
 	textControls[#textControls + 1] = {wx.wxTextCtrl(window, rollingID, "-Run1", wx.wxPoint(0, rollingYPos), wx.wxSize(100,30)), "-opost"};
-	frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent(q));
+	frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent());
 	addBoth(40);
 
 	--Parameters section
@@ -198,14 +194,16 @@ local function main()
 
 	--Additional args and the arg viewer
 	makeLabel("Additional arguments");
-	wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(0, rollingYPos), wx.wxSize(300, 30));
+	additionalArgsControl = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(0, rollingYPos), wx.wxSize(500, 30));
+	frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent());
 	addBoth(40);
 	makeLabel("Output command");
-	wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(0, rollingYPos), wx.wxSize(300, 30), wx.wxTE_READONLY);
+	outputCommandControl = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(0, rollingYPos), wx.wxSize(500, 90), bit32.bor(wx.wxTE_READONLY, wx.wxTE_NO_VSCROLL,wx.wxTE_MULTILINE));
 	frame:Show();
 end
 
 
 main();
+updateFullArgs();
 wx.wxGetApp():MainLoop()
 
