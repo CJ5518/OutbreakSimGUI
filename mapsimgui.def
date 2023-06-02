@@ -33,6 +33,15 @@ From: ubuntu:20.04
     mkdir /usr/local/lib/lua/5.1/
     cp /wxlua/wxLua/buildlinux/lib/Release/libwx.so /usr/local/lib/lua/5.1/wx.so
     rm -rf /wxWidgets/
+    cd /
+    mkdir workspace/
+    cd workspace
+    wget https://github.com/CJ5518/MapSimulation1/releases/download/Build-2023.6.2/LinuxHeadless-2023.6.2.tar
+    mkdir mapsim/
+    tar -xf Linux-2023.6.2.tar -C mapsim
+    cd ..
+    git clone https://github.com/CJ5518/OutbreakSimGUI mapsimgui
+    
 
 %runscript
     lua -e "require('wx'); f = wx.wxFrame(wx.NULL, -1, 'Title'); f:Show(); wx.wxGetApp():MainLoop()"
