@@ -5,6 +5,8 @@ local module = {};
 local homeDirProgram = io.popen("echo $HOME", "r");
 local homeDir = homeDirProgram:read("*a");
 homeDirProgram:close();
+homeDir = homeDir:gsub("\n","");
+module.homeDir = homeDir;
 
 --Run command n times
 function module.runJob(command, n)
