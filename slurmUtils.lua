@@ -2,19 +2,26 @@
 
 local module = {};
 
+local homeDirProgram = io.popen("echo $HOME", "r");
+local homeDir = homeDirProgram:read("*a");
+homeDirProgram:close();
+
 --Run command n times
 function module.runJob(command, n)
-	local filename = "~/mapsimgui/.slurmfiles/OutbreakSim-" .. os.time() .. ".slurm";
-	os.execute(string.format("echo %s > %s",
-[[#!/bin/bash\\
-\\
-#SBATCH -p tiny\\
-\\
-cd $SLURM_SUBMIT_DIR\\
-\\
+	local filename = homeDir .. "/mapsimgui/.slurmfiles/OutbreakSim-" .. os.time() .. ".slurm";
+	local fileText = string.format(
+[[#!/bin/bash
+
+#SBATCH -p tiny
+
+cd $SLURM_SUBMIT_DIR
+
 %s
-]], command, filename));
-	os.execute(string.format("sbatch -a 1-%d %s", n, filename))
+]], command);
+	local file = io.open(filename, "w");
+	file:write(fileText);
+	file:close();
+	os.execute(string.format("sbatch -a 1-%d %s", n, filename));
 end
 
 function module.printRunningJobs()
