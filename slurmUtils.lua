@@ -6,7 +6,7 @@ local module = {};
 function module.runJob(command, n)
 	local filename = "~/mapsimgui/.slurmfiles/OutbreakSim-" .. os.time() .. ".slurm";
 	local fileText = string.format("#!/bin/bash\\n\\n#SBATCH -p tiny\\n\\ncd $SLURM_SUBMIT_DIR\\n\\n%s", command);
-	os.execute(string.format("printf %s > %s",fileText, filename));
+	os.execute(string.format("printf \"%s\" > \"%s\"",fileText, filename));
 	os.execute(string.format("sbatch -a 1-%d %s", n, filename))
 end
 
