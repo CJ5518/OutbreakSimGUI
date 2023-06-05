@@ -4,6 +4,7 @@ local walkieTalkie = require("walkieTalkie");
 walkieTalkie.init()
 
 while true do
-    walkieTalkie.waitForInput();
-    dofile(walkieTalkie.getInpath());
+	walkieTalkie.waitForInput();
+	dofile(walkieTalkie.getInpath());
+	walkieTalkie.markInputConsumed();
 end

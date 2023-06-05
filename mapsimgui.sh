@@ -4,9 +4,9 @@
 
 cd ~/mapsimgui/
 
-
-bash -c "echo $$ > hostProgramPID; lua hostProgram.lua"
+lua hostProgram.lua &
+LUAS_PID=$!
 
 singularity run mapsimgui.sif
 
-
+kill $LUAS_PID
