@@ -1,4 +1,5 @@
 require("wx");
+local homeDir = require("walkieTalkie").homeDir;
 
 function print(s)
 	wx.wxLogMessage(tostring(s));
@@ -55,7 +56,7 @@ local additionalArgsControl;
 local outputCommandControl;
 
 local function updateFullArgs()
-	local argsString = "~/mapsimgui/mapsim/MapSimulation1.x86_64 -o " .. outputFolderDirPicker:GetPath() .. "/";
+	local argsString = homeDir .. "/mapsimgui/mapsim/MapSimulation1.x86_64 -o " .. outputFolderDirPicker:GetPath() .. "/";
 	local paramString = "";
 	for i,v in ipairs(paramsControls) do
 		if v[1]:GetValue() ~= "" then
@@ -116,7 +117,7 @@ local function main()
 
 	--Output dir picker
 	makeLabel("Output csv folder")
-	outputFolderDirPicker = wx.wxDirPickerCtrl(window, rollingID, "~/mapsimgui/output", "I'm the message parameter",
+	outputFolderDirPicker = wx.wxDirPickerCtrl(window, rollingID, homeDir .. "/mapsimgui/output", "Folder to put the output csvs in",
 		wx.wxPoint(0, rollingYPos), wx.wxSize(500,30),
 		wx.wxDIRP_USE_TEXTCTRL)
 	frame:Connect(rollingID, wx.wxEVT_DIRPICKER_CHANGED, updateFullArgs)

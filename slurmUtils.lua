@@ -12,30 +12,35 @@ function module.runJob(command, n)
 	local fileText = string.format(
 [[#!/bin/bash
 
-#SBATCH -p tiny
+#SBATCH -p tiny -a 1-%d
 
 cd $SLURM_SUBMIT_DIR
 
 %s
-]], command);
+]], n,command);
 	--Write out the slurm job
 	local file = io.open(filename, "w");
 	file:write(fileText);
 	file:close();
 
 	--Execute the slurm job 
-	walkieTalkie.sendInput([[os.execute("touch HERERERERERE")]])
-	--os.execute(string.format("sbatch -a 1-%d %s", n, filename));
+	walkieTalkie.sendInput([[os.execute(string.format("sbatch%s", filename))]])
+	
 end
 
 function module.printRunningJobs()
-	os.execute("squeue --me > delet.txt");
-	local file = io.open("delet.txt", "r");
+	filename = walkieTalkie.homeDir .. "/mapsimgui/deletSqueue.txt";
+	walkieTalkie.sendInput(string.format([[os.execute("squeue --me > %s")]], filename));
+	while not walkieTalkie.fileExists(filename) do
+		os.execute("sleep 0.3");
+	end
+	os.execute("sleep 0.5");
+	local file = io.open(filename, "r");
 	for line in file:lines() do
 		print(line);
 	end
 	file:close();
-	os.execute("rm delet.txt");
+	os.executef("rm %s", filename);
 end
 
 

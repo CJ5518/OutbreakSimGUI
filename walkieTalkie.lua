@@ -23,15 +23,13 @@ module.homeDir = module.readFromProcess("printf $HOME");
 
 local walkiefolder = module.homeDir .. "/.walkie";
 local inpath = walkiefolder .. "/talkieinput";
-local outpath = walkiefolder .. "/talkieoutput";
 local insetpath = walkiefolder .. "/talkieinputset";
-local outsetpath = walkiefolder .. "/talkieoutputset";
 
 --Init the two files
 function module.init()
 	os.executef("mkdir %s", walkiefolder);
-	os.executef("rm -f %s %s", inpath, outpath);
-	os.executef("touch %s %s", inpath, outpath);
+	os.executef("rm -f %s", inpath);
+	os.executef("touch %s", inpath);
 end
 
 --Waits until the insetpath file exists
@@ -44,10 +42,6 @@ end
 
 function module.getInpath()
 	return inpath;
-end
-
-function module.writeOutput()
-
 end
 
 function module.markInputConsumed()
