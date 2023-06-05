@@ -37,7 +37,9 @@ end
 --Waits until the insetpath file exists
 --Or rather, it waits until the file is changed in any way
 function module.waitForInput()
-	os.executef("watch -d -t -g ls -l %s", insetpath);
+	while not module.fileExists(insetpath) do
+		os.execute("sleep 0.4");
+	end
 end
 
 function module.getInpath()
@@ -45,7 +47,7 @@ function module.getInpath()
 end
 
 function module.writeOutput()
-	
+
 end
 
 function module.markInputConsumed()
