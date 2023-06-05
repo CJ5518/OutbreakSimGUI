@@ -4,7 +4,7 @@
 
 cd ~/mapsimgui/
 
-lua hostProgram.lua &>LUAS_OUTPUT
+lua hostProgram.lua &
 LUAS_PID=$!
 
 singularity run mapsimgui.sif
