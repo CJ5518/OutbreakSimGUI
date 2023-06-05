@@ -3,9 +3,8 @@
 cd ~
 mkdir Desktop
 cd Desktop
-touch mapsimgui.sh
+cp ~/mapsimgui/mapsimgui.sh ./mapsimgui.sh
 chmod +x mapsimgui.sh
-printf "#!/bin/bash\n\ncd ~/mapsimgui/\nsingularity run mapsimgui.sif\n" > mapsimgui.sh
 cd ~
 cd mapsimgui
 mkdir output

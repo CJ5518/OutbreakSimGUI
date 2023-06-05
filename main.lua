@@ -106,7 +106,7 @@ local function main()
 	
 	
 	local window = wx.wxScrolledWindow(frame, wx.wxID_ANY);
-	window:SetScrollbars(1,1,1,700);
+	window:SetScrollbars(1,1,1,900);
 
 	local function makeLabel(text)
 		local ret = wx.wxStaticText(window, rollingID, text, wx.wxPoint(0, rollingYPos));
