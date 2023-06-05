@@ -24,7 +24,7 @@ cd $SLURM_SUBMIT_DIR
 	file:close();
 
 	--Execute the slurm job 
-	walkieTalkie.sendInput([[os.execute(string.format("sbatch %s", filename))]])
+	walkieTalkie.sendInput(string.format([[os.execute("sbatch %s")]], filename))
 	
 end
 
