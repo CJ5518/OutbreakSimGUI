@@ -33,13 +33,6 @@ makeEntry(
 )
 
 makeEntry(
-	"Gravity Model",
-	"-gravity",
-	"boolean",
-	"Use the gravity model (default is CJ model)"
-)
-
-makeEntry(
 	"Airports",
 	"-airports",
 	"boolean",

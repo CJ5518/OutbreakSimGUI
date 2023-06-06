@@ -50,6 +50,8 @@ local paramsControls = {};
 --Info for both of these in the form {wxControl, "-stop"}
 local textControls = {};
 local boolControls = {};
+local gravityModelCheckbox;
+local gravityModelsParams = {};
 local airportTextCtrl;
 local outputFolderDirPicker;
 local additionalArgsControl;
@@ -86,6 +88,13 @@ local function updateFullArgs()
 			argsString = argsString .. " " .. v[2]
 		end
 	end
+	--Gravity model stuff
+	if gravityModelCheckbox:IsChecked() then
+		local alpha = gravityModelsParams[1]:GetValue();
+		local beta = gravityModelsParams[2]:GetValue();
+		argsString = argsString .. string.format(" -gravity %s,%s", alpha == "" and "0" or alpha, beta == "" and "0" or beta);
+	end
+
 	argsString = argsString .. " " .. additionalArgsControl:GetValue();
 	outputCommandControl:SetValue(argsString);
 	return argsString;
@@ -167,6 +176,20 @@ local function main()
 		end
 		createDefaultTextCtrlTextEvent()();
 	end);
+	addBoth(40);
+
+	gravityModelCheckbox = wx.wxCheckBox(window, rollingID, "Gravity model", wx.wxPoint(0, rollingYPos), wx.wxSize(150,30));
+	frame:Connect(rollingID, wx.wxEVT_CHECKBOX, createDefaultCheckBoxEvent());
+	addID();
+	wx.wxStaticText(window, rollingID, "alpha:", wx.wxPoint(150, rollingYPos + 5), wx.wxSize(50,30));
+	addID();
+	gravityModelsParams[1] = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(200, rollingYPos), wx.wxSize(100,30));
+	frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent());
+	addID();
+	wx.wxStaticText(window, rollingID, "beta:", wx.wxPoint(320, rollingYPos + 5), wx.wxSize(50,30));
+	addID();
+	gravityModelsParams[2] = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(370, rollingYPos), wx.wxSize(100,30));
+	frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent());
 	addBoth(40);
 
 	--Entries defined in stuff.lua
