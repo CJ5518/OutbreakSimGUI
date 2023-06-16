@@ -39,6 +39,13 @@ makeEntry(
 	"Use airports (default is no airports)"
 )
 
+makeEntry(
+	"How many ticks per statistics update (best left at 1)",
+	"-ticksPerStats",
+	"number",
+	"NA"
+)
+
 
 
 module.params = {
