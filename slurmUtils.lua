@@ -12,7 +12,7 @@ function module.runJob(command, n)
 	local fileText = string.format(
 [[#!/bin/bash
 
-#SBATCH -p tiny -a 1-%d
+#SBATCH --exclusive -p tiny -a 1-%d
 
 cd $SLURM_SUBMIT_DIR
 
