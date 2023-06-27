@@ -116,7 +116,7 @@ local function main()
 	
 	
 	local window = wx.wxScrolledWindow(frame, wx.wxID_ANY);
-	window:SetScrollbars(1,1,1,900);
+	window:SetScrollbars(1,1,1,1100);
 
 	local function makeLabel(text)
 		local ret = wx.wxStaticText(window, rollingID, text, wx.wxPoint(0, rollingYPos));
@@ -178,17 +178,17 @@ local function main()
 	end);
 	addBoth(40);
 
-	gravityModelCheckbox = wx.wxCheckBox(window, rollingID, "Gravity model", wx.wxPoint(0, rollingYPos), wx.wxSize(150,30));
+	gravityModelCheckbox = wx.wxCheckBox(window, rollingID, "Gravity model (vals of .35 for each param are sensible, larger values are crazy)", wx.wxPoint(0, rollingYPos), wx.wxSize(700,30));
 	frame:Connect(rollingID, wx.wxEVT_CHECKBOX, createDefaultCheckBoxEvent());
+	addBoth(40);
+	wx.wxStaticText(window, rollingID, "alpha:", wx.wxPoint(150-150, rollingYPos + 5), wx.wxSize(50,30));
 	addID();
-	wx.wxStaticText(window, rollingID, "alpha:", wx.wxPoint(150, rollingYPos + 5), wx.wxSize(50,30));
-	addID();
-	gravityModelsParams[1] = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(200, rollingYPos), wx.wxSize(100,30));
+	gravityModelsParams[1] = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(200-150, rollingYPos), wx.wxSize(100,30));
 	frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent());
 	addID();
-	wx.wxStaticText(window, rollingID, "beta:", wx.wxPoint(320, rollingYPos + 5), wx.wxSize(50,30));
+	wx.wxStaticText(window, rollingID, "beta:", wx.wxPoint(320-150, rollingYPos + 5), wx.wxSize(50,30));
 	addID();
-	gravityModelsParams[2] = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(370, rollingYPos), wx.wxSize(100,30));
+	gravityModelsParams[2] = wx.wxTextCtrl(window, rollingID, "", wx.wxPoint(370-150, rollingYPos), wx.wxSize(100,30));
 	frame:Connect(rollingID, wx.wxEVT_TEXT, createDefaultTextCtrlTextEvent());
 	addBoth(40);
 
