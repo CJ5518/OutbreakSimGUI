@@ -49,7 +49,12 @@ makeEntry(
 	"number",
 	"Message"
 )
-
+makeEntry(
+	"Spread rate for default movement model (default 1, 0-2 is good)",
+	"--cjspreadRate",
+	"number",
+	"Message"
+)
 makeEntry(
 	"Airports",
 	"-airports",
