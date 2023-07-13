@@ -44,7 +44,7 @@ makeEntry(
 	"Message"
 )
 makeEntry(
-	"Height Factor (0 for no effect, 1 for 100% effect, can double traffic between locations)",
+	"Height Factor (0 for no effect, 1 for 100% effect, can fully remove traffic between locations)",
 	"--heightFactor",
 	"number",
 	"Message"
